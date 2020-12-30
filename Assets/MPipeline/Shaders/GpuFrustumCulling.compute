@@ -15,7 +15,9 @@ float3 _FrustumMinPoint;
 float3 _FrustumMaxPoint;
 struct ClusterMeshData
 {
+    //立方体边长的一半
     float3 extent;
+    //中心点
     float3 position;
     int index;
 };
@@ -26,6 +28,7 @@ Texture2D<half> _HizDepthTex;  SamplerState sampler_HizDepthTex;
 uint _Count;
 float3 _CameraUpVector;
 float4x4 _NonJitterVP;
+//判断是否在可见立方体内
 float PlaneTest(ClusterMeshData info){
     float3 position = info.position;
     float3 extent = info.extent;
@@ -81,6 +84,7 @@ float OcclusionTest(ClusterMeshData info, float4x4 vpMat)
     float4 boxUVs = float4(minXY, maxXY);
     boxUVs = saturate(boxUVs * 0.5 + 0.5);
     float2 size = (boxUVs.zw - boxUVs.xy) * _HizScreenRes.xy;
+    //得到当前BOX的MIP
     float mip = (log2(max(size.x, size.y)));
     if(mip > _HizScreenRes.z)
     {
