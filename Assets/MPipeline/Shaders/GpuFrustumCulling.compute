@@ -59,6 +59,7 @@ static const float3 aggressiveExtentArray[8] =
     float3(-1, -1, 1),
     float3(-1, -1, -1)
 };
+//执行HI-Z算法
 float4 _HizScreenRes;
 float OcclusionTest(ClusterMeshData info, float4x4 vpMat)
 {
@@ -75,6 +76,7 @@ float OcclusionTest(ClusterMeshData info, float4x4 vpMat)
        clipPos /= clipPos.w;
        minXY = min(clipPos.xy, minXY);
        maxXY = max(clipPos.xy, maxXY);
+       //得到立方体用来做判断的深度点
        #ifdef UNITY_REVERSED_Z
        minZ = max(minZ, clipPos.z);
        #else
@@ -101,12 +103,13 @@ float OcclusionTest(ClusterMeshData info, float4x4 vpMat)
         // Use the lower level if we only touch <= 2 texels in both dimensions
         if (dims.x <= 2 && dims.y <= 2)
             mip = level_lower;
-
+    //得到当前屏幕的深度
     float4 depth = float4(_HizDepthTex.SampleLevel(sampler_HizDepthTex, boxUVs.xy, mip),
                          _HizDepthTex.SampleLevel(sampler_HizDepthTex, boxUVs.zy, mip),
                          _HizDepthTex.SampleLevel(sampler_HizDepthTex, boxUVs.xw, mip),
                          _HizDepthTex.SampleLevel(sampler_HizDepthTex, boxUVs.zw, mip)
     );
+    //返回1代表通过测试
     #ifdef UNITY_REVERSED_Z
     depth.xy = min(depth.xy, depth.zw);
     depth.x = min(depth.x, depth.y);
